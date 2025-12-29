@@ -1,0 +1,107 @@
+<div class="space-y-6 fade-in">
+    <div>
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+            <h1 class="gradient-title" style="margin: 0;">Gestão de Cargo (SOC)</h1>
+            <button type="button" class="btn btn-outline btn-sm btn-voltar" onclick="voltarMenuSoc()">
+                ← Voltar
+            </button>
+        </div>
+        <p class="text-muted-foreground mt-2">Incluir, alterar ou excluir o cadastro de Cargos via WebService SOC.</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Operação de Cargo</h3>
+            <p class="card-description">Preencha os dados para incluir, alterar ou excluir um Cargo no SOC.</p>
+        </div>
+        <div class="card-content">
+            <!-- Tabs de Operação -->
+            <div class="tabs" style="margin-bottom: 1.5rem;">
+                <div class="tabs-list">
+                    <button type="button" class="tab-trigger active" data-tab="incluir"
+                        onclick="toggleSocCargoOperation('incluir')">
+                        Incluir Cargo
+                    </button>
+                    <button type="button" class="tab-trigger" data-tab="alterar"
+                        onclick="toggleSocCargoOperation('alterar')">
+                        Alterar Cargo
+                    </button>
+                    <button type="button" class="tab-trigger" data-tab="excluir"
+                        onclick="toggleSocCargoOperation('excluir')">
+                        Excluir Cargo
+                    </button>
+                </div>
+            </div>
+
+            <form id="form-soc-cargo" onsubmit="handleSocCargoSubmit(event)">
+
+                <!-- Campo para Código do Cargo (Obrigatório para Alterar/Excluir) -->
+                <div class="form-group hidden" id="soc-cargo-codigo-group">
+                    <label class="form-label" for="soc-cargo-codigo">Código do Cargo (Código SOC) *</label>
+                    <input type="text" id="soc-cargo-codigo" class="form-input"
+                        placeholder="Código SOC do cargo a ser alterado/excluído">
+                    <small class="text-muted-foreground"
+                        style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                        Obrigatório para operações de Alteração e Exclusão.
+                    </small>
+                </div>
+
+                <!-- Campo para Código da Empresa -->
+                <div class="form-group">
+                    <label class="form-label" for="soc-cargo-codigo-empresa">Código da Empresa (Código SOC) *</label>
+                    <input type="text" id="soc-cargo-codigo-empresa" class="form-input" value="2116841">
+                    <small class="text-muted-foreground"
+                        style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                        Código da empresa onde o cargo será criado/alterado.
+                    </small>
+                </div>
+
+                <!-- Campos de Inclusão/Alteração -->
+                <div id="soc-cargo-campos-incluir-alterar">
+                    <!-- Nome do Cargo -->
+                    <div class="form-group">
+                        <label class="form-label" for="soc-cargo-nome">Nome do Cargo (Máx. 60) *</label>
+                        <input type="text" id="soc-cargo-nome" class="form-input" maxlength="60"
+                            placeholder="Ex: ANALISTA DE SISTEMAS" required>
+                        <small class="text-muted-foreground"
+                            style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                            O nome deve ser único para evitar erro de duplicidade (SOC-301).
+                        </small>
+                    </div>
+
+                    <!-- Função do Cargo (Opcional) -->
+                    <div class="form-group">
+                        <label class="form-label" for="soc-cargo-funcao">Função (Máx. 200)</label>
+                        <textarea id="soc-cargo-funcao" class="form-input" rows="3"
+                            placeholder="Ex: Responsável pelo desenvolvimento e manutenção de sistemas"></textarea>
+                        <small class="text-muted-foreground"
+                            style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                            Descrição da função do cargo (opcional).
+                        </small>
+                    </div>
+
+                    <!-- Status Ativo (Apenas para Alteração) -->
+                    <div class="form-group hidden" id="soc-cargo-ativo-group">
+                        <div class="switch-container">
+                            <label class="switch">
+                                <input type="checkbox" id="soc-cargo-ativo" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                            <label class="form-label" for="soc-cargo-ativo" style="margin-bottom: 0;">Ativo</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="btn-soc-cargo-submit">
+                    Incluir Cargo no SOC
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Área de Resposta -->
+    <div id="soc-cargo-response" class="response-display hidden">
+        <h3 class="card-title">Resposta da Operação</h3>
+        <pre id="soc-cargo-response-content"></pre>
+    </div>
+</div>

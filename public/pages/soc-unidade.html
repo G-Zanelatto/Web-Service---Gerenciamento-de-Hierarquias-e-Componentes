@@ -1,0 +1,126 @@
+<div class="space-y-6 fade-in">
+  <div>
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+      <h1 class="gradient-title" style="margin: 0;">Gestão de Unidade (SOC)</h1>
+      <button type="button" class="btn btn-outline btn-sm btn-voltar" onclick="voltarMenuSoc()">
+        ← Voltar
+      </button>
+    </div>
+    <p class="text-muted-foreground mt-2">Incluir, alterar ou excluir o cadastro de Unidades via WebService SOC.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Operação de Unidade</h3>
+      <p class="card-description">Preencha os dados para incluir, alterar ou excluir uma Unidade no SOC.</p>
+    </div>
+    <div class="card-content">
+      <!-- Tabs de Operação -->
+      <div class="tabs" style="margin-bottom: 1.5rem;">
+        <div class="tabs-list">
+          <button type="button" class="tab-trigger active" data-tab="incluir"
+            onclick="toggleSocUnidadeOperation('incluir')">
+            Incluir Unidade
+          </button>
+          <button type="button" class="tab-trigger" data-tab="alterar" onclick="toggleSocUnidadeOperation('alterar')">
+            Alterar Unidade
+          </button>
+          <button type="button" class="tab-trigger" data-tab="excluir" onclick="toggleSocUnidadeOperation('excluir')">
+            Excluir Unidade
+          </button>
+        </div>
+      </div>
+
+      <form id="form-soc-unidade" onsubmit="handleSocUnidadeSubmit(event)">
+
+        <!-- Campo para Código da Unidade (Obrigatório para Alterar/Excluir) -->
+        <div class="form-group hidden" id="soc-unidade-codigo-group">
+          <label class="form-label" for="soc-unidade-codigo">Código da Unidade (Código SOC) *</label>
+          <input type="text" id="soc-unidade-codigo" class="form-input"
+            placeholder="Código SOC da unidade a ser alterada/excluída">
+          <small class="text-muted-foreground" style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+            Obrigatório para operações de Alteração e Exclusão.
+          </small>
+        </div>
+
+        <!-- Campo para Código da Empresa -->
+        <div class="form-group">
+          <label class="form-label" for="soc-unidade-codigo-empresa">Código da Empresa (Código SOC) *</label>
+          <input type="text" id="soc-unidade-codigo-empresa" class="form-input"
+            placeholder="Código SOC da empresa principal" required>
+          <small class="text-muted-foreground" style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+            Obrigatório para todas as operações.
+          </small>
+        </div>
+
+        <!-- Campos de Inclusão/Alteração -->
+        <div id="soc-unidade-campos-incluir-alterar">
+          <div class="form-group">
+            <label class="form-label" for="soc-unidade-nome">Nome da Unidade (Máx. 60) *</label>
+            <input type="text" id="soc-unidade-nome" class="form-input" maxlength="60"
+              placeholder="Ex: FILIAL SÃO PAULO" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="soc-unidade-razao-social">Razão Social (Máx. 200) *</label>
+            <input type="text" id="soc-unidade-razao-social" class="form-input" maxlength="200"
+              placeholder="Ex: EMPRESA DE EXEMPLO LTDA - FILIAL SP" required>
+          </div>
+
+          <!-- Tipo de Documento -->
+          <div class="form-group">
+            <label class="form-label" for="soc-unidade-tipo-documento">Tipo de Documento *</label>
+            <select id="soc-unidade-tipo-documento" class="form-select" required>
+              <option value="CNPJ">CNPJ</option>
+              <option value="CPF">CPF</option>
+              <option value="CEI">CEI</option>
+              <option value="CAEPF">CAEPF</option>
+              <option value="CNO">CNO</option>
+            </select>
+          </div>
+
+          <!-- Número do Documento -->
+          <div class="form-group">
+            <label class="form-label" for="soc-unidade-cnpj-cei">Número do Documento (Apenas números)
+              *</label>
+            <input type="text" id="soc-unidade-cnpj-cei" class="form-input" placeholder="Ex: 00000000000000" required>
+            <small class="text-muted-foreground" style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+              Insira apenas números, sem pontos ou traços
+            </small>
+          </div>
+
+          <!-- Endereço -->
+          <div class="form-group">
+            <label class="form-label" for="soc-unidade-cod-municipio">Código Município (7 dígitos) *</label>
+            <input type="text" id="soc-unidade-cod-municipio" class="form-input" maxlength="7" placeholder="Ex: 3550308"
+              required>
+            <small class="text-muted-foreground" style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+              Código IBGE do município (7 dígitos)
+            </small>
+          </div>
+
+          <!-- Status Ativo (Apenas para Alteração) -->
+          <div class="form-group hidden" id="soc-unidade-ativo-group">
+            <div class="switch-container">
+              <label class="switch">
+                <input type="checkbox" id="soc-unidade-ativo" checked>
+                <span class="switch-slider"></span>
+              </label>
+              <label class="form-label" for="soc-unidade-ativo" style="margin-bottom: 0;">Ativo</label>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="btn-soc-unidade-submit">
+          Incluir Unidade no SOC
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Área de Resposta -->
+  <div id="soc-unidade-response" class="response-display hidden">
+    <h3 class="card-title">Resposta da Operação</h3>
+    <pre id="soc-unidade-response-content"></pre>
+  </div>
+</div>

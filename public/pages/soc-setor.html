@@ -1,0 +1,107 @@
+<div class="space-y-6 fade-in">
+    <div>
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+            <h1 class="gradient-title" style="margin: 0;">Gestão de Setor (SOC)</h1>
+            <button type="button" class="btn btn-outline btn-sm btn-voltar" onclick="voltarMenuSoc()">
+                ← Voltar
+            </button>
+        </div>
+        <p class="text-muted-foreground mt-2">Incluir, alterar ou excluir o cadastro de Setores via WebService SOC.</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Operação de Setor</h3>
+            <p class="card-description">Preencha os dados para incluir, alterar ou excluir um Setor no SOC.</p>
+        </div>
+        <div class="card-content">
+            <!-- Tabs de Operação -->
+            <div class="tabs" style="margin-bottom: 1.5rem;">
+                <div class="tabs-list">
+                    <button type="button" class="tab-trigger active" data-tab="incluir"
+                        onclick="toggleSocSetorOperation('incluir')">
+                        Incluir Setor
+                    </button>
+                    <button type="button" class="tab-trigger" data-tab="alterar"
+                        onclick="toggleSocSetorOperation('alterar')">
+                        Alterar Setor
+                    </button>
+                    <button type="button" class="tab-trigger" data-tab="excluir"
+                        onclick="toggleSocSetorOperation('excluir')">
+                        Excluir Setor
+                    </button>
+                </div>
+            </div>
+
+            <form id="form-soc-setor" onsubmit="handleSocSetorSubmit(event)">
+
+                <!-- Campo para Código do Setor (Obrigatório para Alterar/Excluir) -->
+                <div class="form-group hidden" id="soc-setor-codigo-group">
+                    <label class="form-label" for="soc-setor-codigo">Código do Setor (Código SOC) *</label>
+                    <input type="text" id="soc-setor-codigo" class="form-input"
+                        placeholder="Código SOC do setor a ser alterado/excluído">
+                    <small class="text-muted-foreground"
+                        style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                        Obrigatório para operações de Alteração e Exclusão.
+                    </small>
+                </div>
+
+                <!-- Campo para Código da Empresa -->
+                <div class="form-group">
+                    <label class="form-label" for="soc-setor-codigo-empresa">Código da Empresa (Código SOC) *</label>
+                    <input type="text" id="soc-setor-codigo-empresa" class="form-input" value="2116841">
+                    <small class="text-muted-foreground"
+                        style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                        Código da empresa onde o setor será criado/alterado.
+                    </small>
+                </div>
+
+                <!-- Campos de Inclusão/Alteração -->
+                <div id="soc-setor-campos-incluir-alterar">
+                    <!-- Nome do Setor -->
+                    <div class="form-group">
+                        <label class="form-label" for="soc-setor-nome">Nome do Setor (Máx. 60) *</label>
+                        <input type="text" id="soc-setor-nome" class="form-input" maxlength="60"
+                            placeholder="Ex: ADMINISTRATIVO" required>
+                        <small class="text-muted-foreground"
+                            style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                            O nome deve ser único para evitar erro de duplicidade (SOC-304).
+                        </small>
+                    </div>
+
+                    <!-- Descrição do Setor -->
+                    <div class="form-group">
+                        <label class="form-label" for="soc-setor-descricao">Descrição</label>
+                        <textarea id="soc-setor-descricao" class="form-input" rows="3"
+                            placeholder="Ex: Setor responsável pelas atividades administrativas"></textarea>
+                        <small class="text-muted-foreground"
+                            style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                            Descrição opcional do setor.
+                        </small>
+                    </div>
+
+                    <!-- Status Ativo (Apenas para Alteração) -->
+                    <div class="form-group hidden" id="soc-setor-ativo-group">
+                        <div class="switch-container">
+                            <label class="switch">
+                                <input type="checkbox" id="soc-setor-ativo" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                            <label class="form-label" for="soc-setor-ativo" style="margin-bottom: 0;">Ativo</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="btn-soc-setor-submit">
+                    Incluir Setor no SOC
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Área de Resposta -->
+    <div id="soc-setor-response" class="response-display hidden">
+        <h3 class="card-title">Resposta da Operação</h3>
+        <pre id="soc-setor-response-content"></pre>
+    </div>
+</div>

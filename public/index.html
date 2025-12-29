@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Hierarquia - Gerenciamento de Hierarquias SOC</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/sidebar-toggle.js"></script>
+
+  <script>
+    // Verificar autenticação ao carregar a página
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = checkAuth();
+      if (user) {
+        document.getElementById('currentUser').textContent = user.username;
+      }
+    });
+  </script>
+</head>
+
+<body>
+  <!-- Container Principal -->
+  <div class="app-container">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h1 class="sidebar-logo">WebHierarquia</h1>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul class="sidebar-menu">
+          <li class="sidebar-menu-item">
+            <a href="#" class="sidebar-menu-link active" data-page="page-add"
+              onclick="navigateTo('page-add'); return false;">
+              <svg class="sidebar-menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              <span>Adicionar Hierarquia</span>
+            </a>
+          </li>
+
+          <li class="sidebar-menu-item">
+            <a href="#" class="sidebar-menu-link" data-page="page-alter"
+              onclick="navigateTo('page-alter'); return false;">
+              <svg class="sidebar-menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                </path>
+              </svg>
+              <span>Alterar Hierarquia</span>
+            </a>
+          </li>
+
+          <li class="sidebar-menu-item">
+            <a href="#" class="sidebar-menu-link" data-page="page-delete"
+              onclick="navigateTo('page-delete'); return false;">
+              <svg class="sidebar-menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                </path>
+              </svg>
+              <span>Excluir Hierarquia</span>
+            </a>
+          </li>
+
+          <li class="sidebar-menu-item">
+            <a href="#" class="sidebar-menu-link" data-page="page-batch"
+              onclick="navigateTo('page-batch'); return false;">
+              <svg class="sidebar-menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+              </svg>
+              <span>Operações em Lote</span>
+            </a>
+          </li>
+
+          <li class="sidebar-menu-item">
+            <a href="#" class="sidebar-menu-link" data-page="page-soc-gestao"
+              onclick="navigateTo('page-soc-gestao'); return false;">
+              <svg class="sidebar-menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 7v10a2 2 0 002 2h12a2 2 0 002-2V7M4 7h16M4 7l-2 4m2-4l2 4m12-4l-2 4m2-4l2 4M12 15v-4"></path>
+              </svg>
+              <span>Gestão SOC</span>
+            </a>
+          </li>
+
+          <li class="sidebar-menu-item">
+            <a href="#" class="sidebar-menu-link" data-page="page-logs"
+              onclick="navigateTo('page-logs'); return false;">
+              <svg class="sidebar-menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                </path>
+              </svg>
+              <span>Logs do Sistema</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="header">
+        <button id="toggleSidebarBtn" class="btn btn-outline sidebar-toggle" onclick="toggleSidebar()"
+          title="Mostrar/ocultar menu">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h2 class="header-title">Gerenciamento de Hierarquias SOC</h2>
+        <div class="header-user">
+          <span id="currentUser" class="user-name"></span>
+          <button class="btn btn-outline" onclick="logout()" title="Sair do sistema">Sair</button>
+        </div>
+      </header>
+
+
+      <!-- Content Area -->
+      <div class="content-area">
+        <!-- Página: Adicionar Hierarquia -->
+        <div id="page-add" class="page">
+          <div class="space-y-6 fade-in">
+            <div>
+              <h1 class="gradient-title">Adicionar Hierarquia</h1>
+              <p class="text-muted-foreground mt-2">Adicione uma nova hierarquia no sistema SOC</p>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Nova Hierarquia</h3>
+                <p class="card-description">Preencha os dados para adicionar uma nova hierarquia</p>
+              </div>
+              <div class="card-content">
+                <form id="form-add" onsubmit="handleAddSubmit(event)">
+                  <div class="form-group">
+                    <label class="form-label" for="add-empresa">Empresa</label>
+                    <div class="autocomplete-container">
+                      <input type="text" id="add-empresa" class="form-input" placeholder="Digite para buscar empresa..."
+                        autocomplete="off" required>
+                      <div id="add-empresa-results" class="autocomplete-results"></div>
+                    </div>
+                    <input type="hidden" id="add-empresa-code" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="add-unidade">Unidade</label>
+                    <div class="autocomplete-container">
+                      <input type="text" id="add-unidade" class="form-input"
+                        placeholder="Selecione uma empresa primeiro..." autocomplete="off" disabled required>
+                      <div id="add-unidade-results" class="autocomplete-results"></div>
+                    </div>
+                    <input type="hidden" id="add-unidade-code" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="add-setor">Setor</label>
+                    <div class="autocomplete-container">
+                      <input type="text" id="add-setor" class="form-input"
+                        placeholder="Selecione uma empresa primeiro..." autocomplete="off" disabled required>
+                      <div id="add-setor-results" class="autocomplete-results"></div>
+                    </div>
+                    <input type="hidden" id="add-setor-code" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="add-cargo">Cargo</label>
+                    <div class="autocomplete-container">
+                      <input type="text" id="add-cargo" class="form-input"
+                        placeholder="Selecione uma empresa primeiro..." autocomplete="off" disabled required>
+                      <div id="add-cargo-results" class="autocomplete-results"></div>
+                    </div>
+                    <input type="hidden" id="add-cargo-code" required>
+                  </div>
+
+                  <div class="form-group">
+                    <div class="switch-container">
+                      <label class="switch">
+                        <input type="checkbox" id="add-ativo" checked>
+                        <span class="switch-slider"></span>
+                      </label>
+                      <label class="form-label" for="add-ativo" style="margin-bottom: 0;">Ativo</label>
+                    </div>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary" id="btn-add-submit">
+                    Adicionar Hierarquia
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <div id="add-response" class="response-display hidden">
+              <pre id="add-response-content"></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Página: Alterar Hierarquia -->
+        <div id="page-alter" class="page hidden">
+          <div class="space-y-6 fade-in">
+            <div>
+              <h1 class="gradient-title">Alterar Hierarquia</h1>
+              <p class="text-muted-foreground mt-2">Modifique o status de uma hierarquia existente</p>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Alterar Status</h3>
+                <p class="card-description">Informe os dados da hierarquia e o novo status</p>
+              </div>
+              <div class="card-content">
+                <form id="form-alter" onsubmit="handleAlterSubmit(event)">
+                  <div class="form-group">
+                    <label class="form-label" for="alter-empresa">Empresa</label>
+                    <div class="autocomplete-container">
+                      <input type="text" id="alter-empresa" class="form-input"
+                        placeholder="Digite para buscar empresa..." autocomplete="off" required>
+                      <div id="alter-empresa-results" class="autocomplete-results"></div>
+                    </div>
+                    <input type="hidden" id="alter-empresa-code" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="alter-unidade">Unidade</label>
+                    <div class="autocomplete-container">
+                      <input type="text" id="alter-unidade" class="form-input"
+                        placeholder="Selecione uma empresa primeiro..." autocomplete="off" disabled required>
+                      <div id="alter-unidade-results" class="autocomplete-results"></div>
+                    </div>
+                    <input type="hidden" id="alter-unidade-code" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="alter-setor">Setor</label>
+                    <div class="autocomplete-container">
+                      <input type="text" id="alter-setor" class="form-input"
+                        placeholder="Selecione uma empresa primeiro..." autocomplete="off" disabled required>
+                      <div id="alter-setor-results" class="autocomplete-results"></div>
+                    </div>
+                    <input type="hidden" id="alter-setor-code" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="alter-cargo">Cargo</label>
+                    <div class="autocomplete-container">
+                      <input type="text" id="alter-cargo" class="form-input"
+                        placeholder="Selecione uma empresa primeiro..." autocomplete="off" disabled required>
+                      <div id="alter-cargo-results" class="autocomplete-results"></div>
+                    </div>
+                    <input type="hidden" id="alter-cargo-code" required>
+                  </div>
+
+                  <div class="form-group">
+                    <div class="switch-container">
+                      <label class="switch">
+                        <input type="checkbox" id="alter-ativo">
+                        <span class="switch-slider"></span>
+                      </label>
+                      <label class="form-label" for="alter-ativo" style="margin-bottom: 0;">Ativo</label>
+                    </div>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary" id="btn-alter-submit">
+                    Alterar Hierarquia
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <div id="alter-response" class="response-display hidden">
+              <pre id="alter-response-content"></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Página: Excluir Hierarquia -->
+        <div id="page-delete" class="page hidden">
+          <div class="space-y-6 fade-in">
+            <div>
+              <h1 class="gradient-title">Excluir Hierarquia</h1>
+              <p class="text-muted-foreground mt-2">Remova uma hierarquia existente do sistema</p>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Remover Hierarquia</h3>
+                <p class="card-description">Informe os dados da hierarquia para exclusão</p>
+              </div>
+              <div class="card-content">
+                <form id="form-delete" onsubmit="handleDeleteSubmit(event)">
+                  <div class="form-group">
+                    <label class="form-label" for="delete-empresa">Empresa</label>
+                    <div class="autocomplete-container">
+                      <input type="text" id="delete-empresa" class="form-input"
+                        placeholder="Digite para buscar empresa..." autocomplete="off" required>
+                      <div id="delete-empresa-results" class="autocomplete-results"></div>
+                    </div>
+                    <input type="hidden" id="delete-empresa-code" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="delete-unidade">Unidade</label>
+                    <div class="autocomplete-container">
+                      <input type="text" id="delete-unidade" class="form-input"
+                        placeholder="Selecione uma empresa primeiro..." autocomplete="off" disabled required>
+                      <div id="delete-unidade-results" class="autocomplete-results"></div>
+                    </div>
+                    <input type="hidden" id="delete-unidade-code" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="delete-setor">Setor</label>
+                    <div class="autocomplete-container">
+                      <input type="text" id="delete-setor" class="form-input"
+                        placeholder="Selecione uma empresa primeiro..." autocomplete="off" disabled required>
+                      <div id="delete-setor-results" class="autocomplete-results"></div>
+                    </div>
+                    <input type="hidden" id="delete-setor-code" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="delete-cargo">Cargo</label>
+                    <div class="autocomplete-container">
+                      <input type="text" id="delete-cargo" class="form-input"
+                        placeholder="Selecione uma empresa primeiro..." autocomplete="off" disabled required>
+                      <div id="delete-cargo-results" class="autocomplete-results"></div>
+                    </div>
+                    <input type="hidden" id="delete-cargo-code" required>
+                  </div>
+
+                  <button type="submit" class="btn btn-destructive" id="btn-delete-submit">
+                    Excluir Hierarquia
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <div id="delete-response" class="response-display hidden">
+              <pre id="delete-response-content"></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Página: Operações em Lote -->
+        <div id="page-batch" class="page hidden">
+          <div class="space-y-6 fade-in">
+            <div>
+              <h1 class="gradient-title">Operações em Lote</h1>
+              <p class="text-muted-foreground mt-2">Processe múltiplas hierarquias simultaneamente</p>
+            </div>
+
+            <div class="card">
+              <div class="card-content">
+                <div class="tabs">
+                  <div class="tabs-list">
+                    <button class="tab-trigger active" onclick="switchTab('batch-incluir')">
+                      Incluir em Lote
+                    </button>
+                    <button class="tab-trigger" onclick="switchTab('batch-alterar')">
+                      Alterar em Lote
+                    </button>
+                  </div>
+
+                  <!-- Tab: Incluir em Lote -->
+                  <div id="batch-incluir" class="tab-content active">
+                    <div id="batch-incluir-items"></div>
+
+                    <button type="button" class="btn btn-secondary" onclick="addBatchItem('incluir')">
+                      <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                      </svg>
+                      Adicionar Item
+                    </button>
+
+                    <button type="button" class="btn btn-primary mt-4" onclick="handleBatchSubmit('incluirLote')"
+                      id="btn-batch-incluir">
+                      Processar Lote
+                    </button>
+                  </div>
+
+                  <!-- Tab: Alterar em Lote -->
+                  <div id="batch-alterar" class="tab-content">
+                    <div id="batch-alterar-items"></div>
+
+                    <button type="button" class="btn btn-secondary" onclick="addBatchItem('alterar')">
+                      <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                      </svg>
+                      Adicionar Item
+                    </button>
+
+                    <button type="button" class="btn btn-primary mt-4"
+                      onclick="handleBatchSubmit('alterarSituacaoLote')" id="btn-batch-alterar">
+                      Processar Lote
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="batch-response" class="response-display hidden">
+              <pre id="batch-response-content"></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Páginas de Gestão SOC -->
+        <div id="page-soc-unidade" class="page hidden">
+          <!-- Conteúdo será carregado de pagessoc-unidade.html -->
+        </div>
+        <div id="page-soc-gestao" class="page hidden">
+          <div class="space-y-6 fade-in">
+            <div>
+              <h1 class="gradient-title">Gestão SOC</h1>
+              <p class="text-muted-foreground mt-2">Selecione uma das opções abaixo para gerenciar as entidades do SOC.
+              </p>
+            </div>
+            <div class="option-card-grid" id="gestao-soc-cards">
+              <!-- Cards serão inseridos aqui via JavaScript -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Página: Gestão de Empresa SOC -->
+        <div id="page-soc-empresa" class="page hidden">
+          <!-- O conteúdo será carregado de soc-empresa.html via JavaScript ou pode ser inserido aqui -->
+          <div class="space-y-6 fade-in">
+            <div>
+              <h1 class="gradient-title">Gestão de Empresa (SOC)</h1>
+              <p class="text-muted-foreground mt-2">Incluir ou alterar o cadastro de Empresas via WebService SOC.</p>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Operação de Empresa</h3>
+                <p class="card-description">Preencha os dados para incluir ou alterar uma Empresa no SOC.</p>
+              </div>
+              <div class="card-content">
+                <!-- Tabs de Operação -->
+                <div class="tabs" style="margin-bottom: 1.5rem;">
+                  <div class="tabs-list">
+                    <button type="button" class="tab-trigger active" data-tab="incluir"
+                      onclick="toggleSocEmpresaOperation('incluir')">
+                      Incluir Empresa
+                    </button>
+                    <button type="button" class="tab-trigger" data-tab="alterar"
+                      onclick="toggleSocEmpresaOperation('alterar')">
+                      Alterar Empresa
+                    </button>
+                  </div>
+                </div>
+
+                <form id="form-soc-empresa" onsubmit="handleSocEmpresaSubmit(event)">
+
+                  <!-- Campo para ID Local (para alteração) -->
+                  <div class="form-group hidden" id="soc-empresa-local-id-group">
+                    <label class="form-label" for="soc-empresa-local-id">ID Local da Empresa (Código SOC) *</label>
+                    <input type="text" id="soc-empresa-local-id" class="form-input"
+                      placeholder="Código SOC da empresa a ser alterada">
+                    <small class="text-muted-foreground"
+                      style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                      Obrigatório para operação de Alteração
+                    </small>
+                  </div>
+
+                  <!-- Campos da Empresa -->
+                  <div class="form-group">
+                    <label class="form-label" for="soc-empresa-nome-abreviado">Nome Abreviado (Máx. 60) *</label>
+                    <input type="text" id="soc-empresa-nome-abreviado" class="form-input" maxlength="60"
+                      placeholder="Ex: EMPRESA LTDA" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="soc-empresa-razao-social">Razão Social (Máx. 200) *</label>
+                    <input type="text" id="soc-empresa-razao-social" class="form-input" maxlength="200"
+                      placeholder="Ex: EMPRESA DE EXEMPLO LTDA" required>
+                  </div>
+
+                  <!-- Tipo de Documento -->
+                  <div class="form-group">
+                    <label class="form-label" for="soc-empresa-tipo-documento">Tipo de Documento *</label>
+                    <select id="soc-empresa-tipo-documento" class="form-select" required>
+                      <option value="CNPJ">CNPJ</option>
+                      <option value="CPF">CPF</option>
+                      <option value="CEI">CEI</option>
+                      <option value="CAEPF">CAEPF</option>
+                      <option value="CNO">CNO</option>
+                    </select>
+                  </div>
+
+                  <!-- Número do Documento -->
+                  <div class="form-group">
+                    <label class="form-label" for="soc-empresa-cnpj">Número do Documento (Apenas números) *</label>
+                    <input type="text" id="soc-empresa-cnpj" class="form-input" placeholder="Ex: 00000000000000"
+                      required>
+                    <small class="text-muted-foreground"
+                      style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                      Insira apenas números, sem pontos ou traços
+                    </small>
+                  </div>
+
+                  <!-- Endereço -->
+                  <div class="form-group">
+                    <label class="form-label" for="soc-empresa-cod-municipio">Código Município (7 dígitos) *</label>
+                    <input type="text" id="soc-empresa-cod-municipio" class="form-input" maxlength="7"
+                      placeholder="Ex: 3550308" required>
+                    <small class="text-muted-foreground"
+                      style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                      Código IBGE do município (7 dígitos)
+                    </small>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary" id="btn-soc-empresa-submit">
+                    Incluir Empresa no SOC
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Área de Resposta -->
+            <div id="soc-empresa-response" class="response-display hidden">
+              <h3 class="card-title">Resposta da Operação</h3>
+              <pre id="soc-empresa-response-content"></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Página: Gestão SOC - Unidade -->
+        <div id="page-soc-unidade" class="page hidden">
+          <div class="space-y-6 fade-in">
+            <div>
+              <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                <h1 class="gradient-title" style="margin: 0;">Gestão de Unidade (SOC)</h1>
+                <button type="button" class="btn btn-outline btn-sm btn-voltar" onclick="voltarMenuSoc()">
+                  ← Voltar
+                </button>
+              </div>
+              <p class="text-muted-foreground mt-2">Incluir, alterar ou excluir o cadastro de Unidades via WebService
+                SOC.</p>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Operação de Unidade</h3>
+                <p class="card-description">Preencha os dados para incluir, alterar ou excluir uma Unidade no SOC.</p>
+              </div>
+              <div class="card-content">
+                <!-- Tabs de Operação -->
+                <div class="tabs" style="margin-bottom: 1.5rem;">
+                  <div class="tabs-list">
+                    <button type="button" class="tab-trigger active" data-tab="incluir"
+                      onclick="toggleSocUnidadeOperation('incluir')">
+                      Incluir Unidade
+                    </button>
+                    <button type="button" class="tab-trigger" data-tab="alterar"
+                      onclick="toggleSocUnidadeOperation('alterar')">
+                      Alterar Unidade
+                    </button>
+                    <button type="button" class="tab-trigger" data-tab="excluir"
+                      onclick="toggleSocUnidadeOperation('excluir')">
+                      Excluir Unidade
+                    </button>
+                  </div>
+                </div>
+
+                <form id="form-soc-unidade" onsubmit="handleSocUnidadeSubmit(event)">
+
+                  <!-- Campo para Código da Unidade (Obrigatório para Alterar/Excluir) -->
+                  <div class="form-group hidden" id="soc-unidade-codigo-group">
+                    <label class="form-label" for="soc-unidade-codigo">Código da Unidade (Código SOC) *</label>
+                    <input type="text" id="soc-unidade-codigo" class="form-input"
+                      placeholder="Código SOC da unidade a ser alterada/excluída">
+                    <small class="text-muted-foreground"
+                      style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                      Obrigatório para operações de Alteração e Exclusão.
+                    </small>
+                  </div>
+
+                  <!-- Campo para Código da Empresa (Obrigatório para todas as operações) -->
+                  <div class="form-group">
+                    <label class="form-label" for="soc-unidade-codigo-empresa">Código da Empresa (Código SOC) *</label>
+                    <input type="text" id="soc-unidade-codigo-empresa" class="form-input"
+                      placeholder="Código SOC da empresa principal" required>
+                    <small class="text-muted-foreground"
+                      style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                      Obrigatório para todas as operações.
+                    </small>
+                  </div>
+
+                  <!-- Campos da Unidade (Obrigatórios para Incluir/Alterar) -->
+                  <div id="soc-unidade-campos-incluir-alterar">
+                    <div class="form-group">
+                      <label class="form-label" for="soc-unidade-nome">Nome da Unidade (Máx. 60) *</label>
+                      <input type="text" id="soc-unidade-nome" class="form-input" maxlength="60"
+                        placeholder="Ex: FILIAL SÃO PAULO" required>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="form-label" for="soc-unidade-razao-social">Razão Social (Máx. 200) *</label>
+                      <input type="text" id="soc-unidade-razao-social" class="form-input" maxlength="200"
+                        placeholder="Ex: EMPRESA DE EXEMPLO LTDA - FILIAL SP" required>
+                    </div>
+
+                    <!-- Tipo de Documento -->
+                    <div class="form-group">
+                      <label class="form-label" for="soc-unidade-tipo-documento">Tipo de Documento *</label>
+                      <select id="soc-unidade-tipo-documento" class="form-select" required>
+                        <option value="CNPJ">CNPJ</option>
+                        <option value="CPF">CPF</option>
+                        <option value="CEI">CEI</option>
+                        <option value="CAEPF">CAEPF</option>
+                        <option value="CNO">CNO</option>
+                      </select>
+                    </div>
+
+                    <!-- Número do Documento -->
+                    <div class="form-group">
+                      <label class="form-label" for="soc-unidade-cnpj-cei">Número do Documento (Apenas números)
+                        *</label>
+                      <input type="text" id="soc-unidade-cnpj-cei" class="form-input" placeholder="Ex: 00000000000000"
+                        required>
+                      <small class="text-muted-foreground"
+                        style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                        Insira apenas números, sem pontos ou traços
+                      </small>
+                    </div>
+
+                    <!-- Endereço -->
+                    <div class="form-group">
+                      <label class="form-label" for="soc-unidade-cod-municipio">Código Município (7 dígitos) *</label>
+                      <input type="text" id="soc-unidade-cod-municipio" class="form-input" maxlength="7"
+                        placeholder="Ex: 3550308" required>
+                      <small class="text-muted-foreground"
+                        style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                        Código IBGE do município (7 dígitos)
+                      </small>
+                    </div>
+
+                    <!-- Status Ativo (Apenas para Alteração) -->
+                    <div class="form-group hidden" id="soc-unidade-ativo-group">
+                      <div class="switch-container">
+                        <label class="switch">
+                          <input type="checkbox" id="soc-unidade-ativo" checked>
+                          <span class="switch-slider"></span>
+                        </label>
+                        <label class="form-label" for="soc-unidade-ativo" style="margin-bottom: 0;">Ativo</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary" id="btn-soc-unidade-submit">
+                    Incluir Unidade no SOC
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Área de Resposta -->
+            <div id="soc-unidade-response" class="response-display hidden">
+              <h3 class="card-title">Resposta da Operação</h3>
+              <pre id="soc-unidade-response-content"></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Página: Gestão SOC - Setor -->
+        <div id="page-soc-setor" class="page hidden">
+          <div class="space-y-6 fade-in">
+            <div>
+              <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                <h1 class="gradient-title" style="margin: 0;">Gestão de Setor (SOC)</h1>
+                <button type="button" class="btn btn-outline btn-sm btn-voltar" onclick="voltarMenuSoc()">
+                  ← Voltar
+                </button>
+              </div>
+              <p class="text-muted-foreground mt-2">Incluir, alterar ou excluir o cadastro de Setores via WebService
+                SOC.</p>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Operação de Setor</h3>
+                <p class="card-description">Preencha os dados para incluir, alterar ou excluir um Setor no SOC.</p>
+              </div>
+              <div class="card-content">
+                <!-- Tabs de Operação -->
+                <div class="tabs" style="margin-bottom: 1.5rem;">
+                  <div class="tabs-list">
+                    <button type="button" class="tab-trigger active" data-tab="incluir"
+                      onclick="toggleSocSetorOperation('incluir')">
+                      Incluir Setor
+                    </button>
+                    <button type="button" class="tab-trigger" data-tab="alterar"
+                      onclick="toggleSocSetorOperation('alterar')">
+                      Alterar Setor
+                    </button>
+                    <button type="button" class="tab-trigger" data-tab="excluir"
+                      onclick="toggleSocSetorOperation('excluir')">
+                      Excluir Setor
+                    </button>
+                  </div>
+                </div>
+
+                <form id="form-soc-setor" onsubmit="handleSocSetorSubmit(event)">
+
+                  <!-- Campo para Código do Setor (Obrigatório para Alterar/Excluir) -->
+                  <div class="form-group hidden" id="soc-setor-codigo-group">
+                    <label class="form-label" for="soc-setor-codigo">Código do Setor (Código SOC) *</label>
+                    <input type="text" id="soc-setor-codigo" class="form-input"
+                      placeholder="Código SOC do setor a ser alterado/excluído">
+                    <small class="text-muted-foreground"
+                      style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                      Obrigatório para operações de Alteração e Exclusão.
+                    </small>
+                  </div>
+
+                  <!-- Campo para Código da Empresa -->
+                  <div class="form-group">
+                    <label class="form-label" for="soc-setor-codigo-empresa">Código da Empresa (Código SOC) *</label>
+                    <input type="text" id="soc-setor-codigo-empresa" class="form-input" value="2116841">
+                    <small class="text-muted-foreground"
+                      style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                      Código da empresa onde o setor será criado/alterado.
+                    </small>
+                  </div>
+
+                  <!-- Campos de Inclusão/Alteração -->
+                  <div id="soc-setor-campos-incluir-alterar">
+                    <!-- Nome do Setor -->
+                    <div class="form-group">
+                      <label class="form-label" for="soc-setor-nome">Nome do Setor (Máx. 60) *</label>
+                      <input type="text" id="soc-setor-nome" class="form-input" maxlength="60"
+                        placeholder="Ex: ADMINISTRATIVO" required>
+                      <small class="text-muted-foreground"
+                        style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                        O nome deve ser único para evitar erro de duplicidade (SOC-304).
+                      </small>
+                    </div>
+
+                    <!-- Descrição do Setor -->
+                    <div class="form-group">
+                      <label class="form-label" for="soc-setor-descricao">Descrição</label>
+                      <textarea id="soc-setor-descricao" class="form-input" rows="3"
+                        placeholder="Ex: Setor responsável pelas atividades administrativas"></textarea>
+                      <small class="text-muted-foreground"
+                        style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                        Descrição opcional do setor.
+                      </small>
+                    </div>
+
+                    <!-- Status Ativo (Apenas para Alteração) -->
+                    <div class="form-group hidden" id="soc-setor-ativo-group">
+                      <div class="switch-container">
+                        <label class="switch">
+                          <input type="checkbox" id="soc-setor-ativo" checked>
+                          <span class="switch-slider"></span>
+                        </label>
+                        <label class="form-label" for="soc-setor-ativo" style="margin-bottom: 0;">Ativo</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary" id="btn-soc-setor-submit">
+                    Incluir Setor no SOC
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Área de Resposta -->
+            <div id="soc-setor-response" class="response-display hidden">
+              <h3 class="card-title">Resposta da Operação</h3>
+              <pre id="soc-setor-response-content"></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Página: Gestão SOC - Cargo -->
+        <div id="page-soc-cargo" class="page hidden">
+          <div class="space-y-6 fade-in">
+            <div>
+              <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                <h1 class="gradient-title" style="margin: 0;">Gestão de Cargo (SOC)</h1>
+                <button type="button" class="btn btn-outline btn-sm btn-voltar" onclick="voltarMenuSoc()">
+                  ← Voltar
+                </button>
+              </div>
+              <p class="text-muted-foreground mt-2">Incluir, alterar ou excluir o cadastro de Cargos via WebService SOC.
+              </p>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Operação de Cargo</h3>
+                <p class="card-description">Preencha os dados para incluir, alterar ou excluir um Cargo no SOC.</p>
+              </div>
+              <div class="card-content">
+                <!-- Tabs de Operação -->
+                <div class="tabs" style="margin-bottom: 1.5rem;">
+                  <div class="tabs-list">
+                    <button type="button" class="tab-trigger active" data-tab="incluir"
+                      onclick="toggleSocCargoOperation('incluir')">
+                      Incluir Cargo
+                    </button>
+                    <button type="button" class="tab-trigger" data-tab="alterar"
+                      onclick="toggleSocCargoOperation('alterar')">
+                      Alterar Cargo
+                    </button>
+                    <button type="button" class="tab-trigger" data-tab="excluir"
+                      onclick="toggleSocCargoOperation('excluir')">
+                      Excluir Cargo
+                    </button>
+                  </div>
+                </div>
+
+                <form id="form-soc-cargo" onsubmit="handleSocCargoSubmit(event)">
+
+                  <!-- Campo para Código do Cargo (Obrigatório para Alterar/Excluir) -->
+                  <div class="form-group hidden" id="soc-cargo-codigo-group">
+                    <label class="form-label" for="soc-cargo-codigo">Código do Cargo (Código SOC) *</label>
+                    <input type="text" id="soc-cargo-codigo" class="form-input"
+                      placeholder="Código SOC do cargo a ser alterado/excluído">
+                    <small class="text-muted-foreground"
+                      style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                      Obrigatório para operações de Alteração e Exclusão.
+                    </small>
+                  </div>
+
+                  <!-- Campo para Código da Empresa -->
+                  <div class="form-group">
+                    <label class="form-label" for="soc-cargo-codigo-empresa">Código da Empresa (Código SOC) *</label>
+                    <input type="text" id="soc-cargo-codigo-empresa" class="form-input" value="2116841">
+                    <small class="text-muted-foreground"
+                      style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                      Código da empresa onde o cargo será criado/alterado.
+                    </small>
+                  </div>
+
+                  <!-- Campos de Inclusão/Alteração -->
+                  <div id="soc-cargo-campos-incluir-alterar">
+                    <!-- Nome do Cargo -->
+                    <div class="form-group">
+                      <label class="form-label" for="soc-cargo-nome">Nome do Cargo (Máx. 60) *</label>
+                      <input type="text" id="soc-cargo-nome" class="form-input" maxlength="60"
+                        placeholder="Ex: ANALISTA DE SISTEMAS" required>
+                      <small class="text-muted-foreground"
+                        style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                        O nome deve ser único para evitar erro de duplicidade (SOC-301).
+                      </small>
+                    </div>
+
+                    <!-- Função do Cargo (Opcional) -->
+                    <div class="form-group">
+                      <label class="form-label" for="soc-cargo-funcao">Função (Máx. 200)</label>
+                      <textarea id="soc-cargo-funcao" class="form-input" rows="3"
+                        placeholder="Ex: Responsável pelo desenvolvimento e manutenção de sistemas"></textarea>
+                      <small class="text-muted-foreground"
+                        style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                        Descrição da função do cargo (opcional).
+                      </small>
+                    </div>
+
+                    <!-- Status Ativo (Apenas para Alteração) -->
+                    <div class="form-group hidden" id="soc-cargo-ativo-group">
+                      <div class="switch-container">
+                        <label class="switch">
+                          <input type="checkbox" id="soc-cargo-ativo" checked>
+                          <span class="switch-slider"></span>
+                        </label>
+                        <label class="form-label" for="soc-cargo-ativo" style="margin-bottom: 0;">Ativo</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary" id="btn-soc-cargo-submit">
+                    Incluir Cargo no SOC
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Área de Resposta -->
+            <div id="soc-cargo-response" class="response-display hidden">
+              <h3 class="card-title">Resposta da Operação</h3>
+              <pre id="soc-cargo-response-content"></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Página: Logs do Sistema -->
+        <div id="page-logs" class="page hidden">
+          <div class="space-y-6 fade-in">
+            <div class="logs-container">
+              <div class="logs-header">
+                <h1 class="gradient-title">Histórico de Logs</h1>
+                <div class="logs-actions">
+                  <button class="btn-action btn-export" onclick="exportLogsAsJSON()">📥 Exportar JSON</button>
+                  <button class="btn-action btn-clear" onclick="clearLogs()">🗑️ Limpar Logs</button>
+                </div>
+              </div>
+
+              <div class="logs-stats">
+                <div class="stat-card">
+                  <div class="stat-label">Total de Logs</div>
+                  <div class="stat-value" id="totalLogs">0</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Logins</div>
+                  <div class="stat-value" id="totalLogins">0</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Ações</div>
+                  <div class="stat-value" id="totalActions">0</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Últimas 24h</div>
+                  <div class="stat-value" id="last24h">0</div>
+                </div>
+              </div>
+
+              <div id="logsContainer"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Modal de Confirmação de Exclusão -->
+  <div id="delete-confirmation-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Confirmar Exclusão</h3>
+      </div>
+      <div class="modal-body">
+        <div class="warning-box">
+          <svg class="warning-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+            </path>
+          </svg>
+          <div class="warning-content">
+            <p class="warning-title">Atenção! Esta ação é irreversível.</p>
+            <p class="warning-message">Você está prestes a excluir permanentemente esta hierarquia do sistema. Esta
+              operação não pode ser desfeita.</p>
+          </div>
+        </div>
+        <div class="confirmation-details">
+          <p><strong>Tem certeza que deseja continuar?</strong></p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancelar</button>
+        <button type="button" class="btn btn-destructive" onclick="confirmDelete()">
+          <svg style="width: 16px; height: 16px; margin-right: 4px;" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+            </path>
+          </svg>
+          Confirmar Exclusão
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/sidebar-toggle.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Funções de Logs movidas de logs.html
+    // Sobrescrever a função navigateTo para garantir que os logs sejam carregados ao mudar para a aba
+    const originalNavigateTo = window.navigateTo;
+    window.navigateTo = function (pageId) {
+      originalNavigateTo(pageId);
+      if (pageId === 'page-logs') {
+        displayLogs();
+        updateStats();
+      }
+    };
+
+    function displayLogs() {
+      const logs = getLogs();
+      const container = document.getElementById('logsContainer');
+
+      if (!container) return; // Garante que o elemento existe
+
+      if (logs.length === 0) {
+        container.innerHTML = '<div class="no-logs"><p>Nenhum log registrado ainda.</p></div>';
+        return;
+      }
+
+      // Ordenar logs por data descendente
+      const sortedLogs = [...logs].reverse();
+
+      let html = '<table class="logs-table"><thead><tr>';
+      html += '<th>Data/Hora</th>';
+      html += '<th>Usuário</th>';
+      html += '<th>Ação</th>';
+      html += '<th>Descrição</th>';
+      html += '<th>Detalhes</th>';
+      html += '</tr></thead><tbody>';
+
+      sortedLogs.forEach(log => {
+        html += '<tr>';
+        html += `<td>${log.date} ${log.time}</td>`;
+        html += `<td>${log.user}</td>`;
+        html += `<td><span class="log-action ${log.action}">${log.action}</span></td>`;
+        html += `<td>${log.description}</td>`;
+        html += `<td><code style="font-size: 11px; color: #666;">${JSON.stringify(log.details)}</code></td>`;
+        html += '</tr>';
+      });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    function updateStats() {
+      const logs = getLogs();
+      const now = new Date();
+      const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+      const logins = logs.filter(l => l.action === 'LOGIN').length;
+      const actions = logs.filter(l => !['LOGIN', 'LOGOUT'].includes(l.action)).length;
+      const last24h = logs.filter(l => new Date(l.timestamp) > oneDayAgo).length;
+
+      const totalLogsElement = document.getElementById('totalLogs');
+      const totalLoginsElement = document.getElementById('totalLogins');
+      const totalActionsElement = document.getElementById('totalActions');
+      const last24hElement = document.getElementById('last24h');
+
+      if (totalLogsElement) totalLogsElement.textContent = logs.length;
+      if (totalLoginsElement) totalLoginsElement.textContent = logins;
+      if (totalActionsElement) totalActionsElement.textContent = actions;
+      if (last24hElement) last24hElement.textContent = last24h;
+    }
+
+    // Garante que o displayLogs e updateStats sejam chamados se a página de logs for a ativa ao carregar
+    document.addEventListener('DOMContentLoaded', () => {
+      if (document.getElementById('page-logs') && !document.getElementById('page-logs').classList.contains('hidden')) {
+        displayLogs();
+        updateStats();
+      }
+    });
+
+  </script>
+</body>
+
+</html>
